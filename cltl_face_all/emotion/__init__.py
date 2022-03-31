@@ -27,23 +27,15 @@ class EmotionDetection:
         self.detection_model = face_detection
         self.emotion_classifier = emotion_classifier
 
-    def predict(self, faces, img):
-        for array in faces:
-            for (fX, fY, fX2, fY2, prob) in array:
-                if prob < face_threshold:
-                    continue
+    def predict(self, face):
+        face = np.squeeze(face)
+        
+        roi = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
+        roi = roi.astype("float") / 255.0
+        roi = img_to_array(roi)
+        roi = np.expand_dims(roi, axis=0)
 
-                # Extract the ROI of the face from the grayscale image, resize it to a fixed 28x28 pixels,
-                # and then prepare the ROI for classification via the CNN
-                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                print(f"{fX} {fY} {fX2} {fY2}")
-                roi = gray[int(fY):int(fY2), int(fX):int(fX2)]
-                roi = cv2.resize(roi, (64, 64))
-                roi = roi.astype("float") / 255.0
-                roi = img_to_array(roi)
-                roi = np.expand_dims(roi, axis=0)
-
-                preds = self.emotion_classifier.predict(roi)[0]
-                zipped = zip(EMOTIONS, preds)
-                return predict_highest(zipped)
+        preds = self.emotion_classifier.predict(roi)[0]
+        zipped = zip(EMOTIONS, preds)
+        return predict_highest(zipped)
 

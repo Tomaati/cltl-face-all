@@ -80,7 +80,7 @@ def main():
             # ag and af return a np.ndarray
             age, gender = ag.predict(face)
             embeddings = af.predict(face)
-            emotions = ed.predict(bboxes, img)
+            emotions = ed.predict(bbox, img, face)
 
             # print(len(bbox), len(landmark), len(face), len(age), len(gender), len(embeddings))
 
