@@ -9,10 +9,6 @@ EMOTIONS = ["angry", "disgust", "scared", "happy", "sad", "surprised", "neutral"
 face_threshold = 0.85
 
 
-def predict_highest(preds):
-    return max(preds, key=lambda x: x[1])[0]
-
-
 class EmotionDetection:
 
     def __init__(self):
@@ -27,15 +23,21 @@ class EmotionDetection:
         self.detection_model = face_detection
         self.emotion_classifier = emotion_classifier
 
-    def predict(self, face):
-        face = np.squeeze(face)
-        
+    def predict(self, faces):
+        # Remove batch number from faces
+        face = np.squeeze(faces)
+
+        # Transform Region of Interest to use for the prediction
         roi = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
         roi = roi.astype("float") / 255.0
         roi = img_to_array(roi)
         roi = np.expand_dims(roi, axis=0)
 
         preds = self.emotion_classifier.predict(roi)[0]
-        zipped = zip(EMOTIONS, preds)
-        return predict_highest(zipped)
+        labeled_preds = zip(EMOTIONS, preds)
+        return labeled_preds
+
+    def predict_highest(self, faces):
+        preds = self.predict(faces=faces)
+        return max(preds, key=lambda x: x[1])[0]
 
