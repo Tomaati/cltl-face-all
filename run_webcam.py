@@ -84,7 +84,7 @@ def main():
 
             # print(len(bbox), len(landmark), len(face), len(age), len(gender), len(embeddings))
 
-            for bb, lm, a, g, emb in zip(bbox, landmark, age, gender, embeddings):
+            for bb, lm, a, g, emb, emo in zip(bbox, landmark, age, gender, embeddings, emotions):
                 x1, y1, x2, y2, prob = bb
 
                 if prob < face_threshold:
@@ -103,7 +103,7 @@ def main():
                 label = f"{int(a)} years old, {str(round(g * 100, 1))} % female"
                 draw_label(img, (x1, y1), label, font_scale=0.5, thickness=1)
 
-                label = f"Feeling {emotions}"
+                label = f"Feeling {emo}"
                 draw_label(img, (x2, y2), label, font_scale=0.5, thickness=1)
 
                 emb = emb.reshape(1, 512)

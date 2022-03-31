@@ -20,20 +20,32 @@ class EmotionDetection:
         self.emotion_classifier = emotion_classifier
 
     def predict(self, faces):
-        # Remove batch number from faces
-        face = np.squeeze(faces)
+        assert faces.dtype == np.dtype('uint8'), "dtype should be unit8!"
 
-        # Transform Region of Interest to use for the prediction
-        roi = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
-        roi = roi.astype("float") / 255.0
-        roi = img_to_array(roi)
-        roi = np.expand_dims(roi, axis=0)
+        assert (faces.shape[1], faces.shape[2],
+                faces.shape[3]) == (112, 112, 3), "Faces should be cropped "
+        "and aligned with the shape of 112 by 112 and RGB!"
 
-        preds = self.emotion_classifier.predict(roi)[0]
-        labeled_preds = zip(EMOTIONS, preds)
+        # Remove batch number from faces if 1
+        # faces = np.squeeze(faces)
+        labeled_preds = []
+
+        for face in faces:
+            # Transform Region of Interest to use for the prediction
+            roi = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
+            roi = roi.astype("float") / 255.0
+            roi = img_to_array(roi)
+            roi = np.expand_dims(roi, axis=0)
+
+            preds = self.emotion_classifier.predict(roi)[0]
+            labeled_preds.append(zip(EMOTIONS, preds))
+
         return labeled_preds
 
     def predict_highest(self, faces):
         preds = self.predict(faces=faces)
-        return max(preds, key=lambda x: x[1])[0]
+        res = []
+        for pred in preds:
+            res.append(max(pred, key=lambda x: x[1])[0])
+        return res
 
