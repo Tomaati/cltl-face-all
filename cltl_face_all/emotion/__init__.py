@@ -6,21 +6,17 @@ from tensorflow.keras.preprocessing.image import img_to_array
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 EMOTIONS = ["angry", "disgust", "scared", "happy", "sad", "surprised", "neutral"]
-face_threshold = 0.85
 
 
 class EmotionDetection:
 
-    def __init__(self):
+    def __init__(self, device='cpu'):
         # parameters for loading data and images
-        detection_model_path = 'cltl_face_all/emotion/haarcascade_files/haarcascade_frontalface_default.xml'
         emotion_model_path = 'cltl_face_all/emotion/models/_mini_XCEPTION.102-0.66.hdf5'
 
-        # loading models
-        face_detection = cv2.CascadeClassifier(detection_model_path)
+        # loading model
         emotion_classifier = load_model(emotion_model_path)
 
-        self.detection_model = face_detection
         self.emotion_classifier = emotion_classifier
 
     def predict(self, faces):
